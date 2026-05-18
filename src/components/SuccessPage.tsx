@@ -1,0 +1,77 @@
+"use client";
+
+import React from "react";
+import Image from "next/image";
+
+interface SuccessPageProps {
+    name: string;
+    qrCodeDataUrl: string;
+    onRegisterAnother: () => void;
+}
+
+export default function SuccessPage({
+    name,
+    qrCodeDataUrl,
+    onRegisterAnother,
+}: SuccessPageProps) {
+    return (
+        <div className="text-center space-y-6 animate-fadeIn">
+            {/* Success icon */}
+            <div className="flex justify-center">
+                <div className="w-20 h-20 rounded-full bg-green-500/10 border-2 border-green-500/30 flex items-center justify-center">
+                    <svg
+                        className="w-10 h-10 text-green-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2.5}
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5 13l4 4L19 7"
+                        />
+                    </svg>
+                </div>
+            </div>
+
+            {/* Heading */}
+            <div>
+                <h2 className="text-2xl font-bold text-white mb-1">
+                    Registration Successful!
+                </h2>
+                <p className="text-white/50 text-sm">
+                    Welcome,{" "}
+                    <span className="text-purple-300 font-medium">{name}</span>
+                </p>
+            </div>
+
+            {/* QR Code */}
+            <div className="flex justify-center">
+                <div className="p-4 bg-white rounded-2xl shadow-2xl shadow-purple-500/20">
+                    <Image
+                        src={qrCodeDataUrl}
+                        alt="Your unique QR code"
+                        width={250}
+                        height={250}
+                        className="rounded-lg"
+                    />
+                </div>
+            </div>
+
+            <p className="text-white/40 text-xs max-w-xs mx-auto">
+                Present this QR code to access the vending machine. A copy has been
+                saved to your registration record.
+            </p>
+
+            {/* Register another */}
+            <button
+                type="button"
+                onClick={onRegisterAnother}
+                className="w-full py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 transition-all duration-300 shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-[1.02] active:scale-[0.98]"
+            >
+                Register Another Attendee
+            </button>
+        </div>
+    );
+}
