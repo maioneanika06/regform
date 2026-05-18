@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
-import { v4 as uuidv4 } from "uuid";
+import React, { useState, useCallback, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import RegistrationForm, { FormData } from "@/components/RegistrationForm";
 import FaceCapture from "@/components/FaceCapture";
 import SuccessPage from "@/components/SuccessPage";
@@ -14,12 +14,41 @@ function sanitize(str: string): string {
   return str.replace(/[<>&"']/g, "").trim();
 }
 
-export default function Home() {
+function RegistrationContent() {
+  const searchParams = useSearchParams();
+  const eventId = searchParams.get("eventId");
+
+  const [eventDetails, setEventDetails] = useState<{ name: string; event_date: string } | null>(null);
+  const [eventError, setEventError] = useState<string>("");
+
   const [step, setStep] = useState<Step>("form");
   const [formData, setFormData] = useState<FormData | null>(null);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [processingMessage, setProcessingMessage] = useState<string>("");
+
+  useEffect(() => {
+    if (!eventId) {
+      setEventError("No event ID provided in the URL.");
+      return;
+    }
+
+    const fetchEvent = async () => {
+      const { data, error } = await supabase
+        .from("events")
+        .select("name, event_date")
+        .eq("id", eventId)
+        .single();
+
+      if (error || !data) {
+        setEventError("Invalid or missing Event ID.");
+      } else {
+        setEventDetails(data);
+      }
+    };
+
+    fetchEvent();
+  }, [eventId]);
 
   const handleFormSubmit = useCallback((data: FormData) => {
     setFormData(data);
@@ -29,18 +58,19 @@ export default function Home() {
 
   const handleFaceCapture = useCallback(
     async (descriptor: number[]) => {
-      if (!formData) return;
+      if (!formData || !eventId) return;
 
       setStep("processing");
       setError("");
 
       try {
-        // 1. Check duplicate email
+        // 1. Check duplicate email for THIS event
         setProcessingMessage("Checking email availability...");
         const { data: existing, error: selectError } = await supabase
           .from("attendees")
           .select("id")
           .eq("email", formData.email.toLowerCase().trim())
+          .eq("event_id", eventId)
           .maybeSingle();
 
         if (selectError) {
@@ -54,45 +84,64 @@ export default function Home() {
 
         if (existing) {
           setError(
-            "This email is already registered. Please use a different email address."
+            "This email is already registered for this event. Please use a different email address."
           );
           setStep("form");
           return;
         }
 
-        // 2. Generate QR code
-        setProcessingMessage("Generating your unique QR code...");
-        const qrValue = uuidv4();
-        const qrDataUrl = await generateQRCode(qrValue);
-
-        // 3. Insert into Supabase
+        // 2. Insert into Supabase
         setProcessingMessage("Saving registration data...");
-        const { error: insertError } = await supabase
+        const { data: newAttendee, error: insertError } = await supabase
           .from("attendees")
           .insert({
+            event_id: eventId,
             full_name: sanitize(formData.fullName),
             email: sanitize(formData.email).toLowerCase(),
             contact_number: sanitize(formData.contactNumber),
             company: sanitize(formData.company),
+            role: 'Attendee',
             face_encoding: descriptor,
-            qr_code_value: qrValue,
-          });
+          })
+          .select("id")
+          .single();
 
-        if (insertError) {
+        if (insertError || !newAttendee) {
           console.error("Supabase insert error:", insertError);
-          if (insertError.code === "23505") {
+          if (insertError?.code === "23505") {
             setError(
               "This email is already registered. Please use a different email."
             );
-            setStep("form");
-            return;
+          } else {
+            setError(`Database error: ${insertError?.message || 'Unknown error'}`);
           }
-          setError(`Database error: ${insertError.message}`);
           setStep("form");
           return;
         }
 
-        // 4. Success!
+        // 3. Send Email
+        setProcessingMessage("Sending confirmation email...");
+        const emailResponse = await fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: formData.email,
+            fullName: formData.fullName,
+            eventName: eventDetails?.name,
+            eventDate: eventDetails?.event_date,
+            attendeeId: newAttendee.id
+          })
+        });
+
+        if (!emailResponse.ok) {
+          console.warn('Email failed to send, but registration was successful.');
+        }
+
+        // 4. Generate QR code for the success screen
+        setProcessingMessage("Generating your unique QR code...");
+        const qrDataUrl = await generateQRCode(newAttendee.id);
+        
+        // 5. Success!
         setQrCodeDataUrl(qrDataUrl);
         setStep("success");
       } catch (err) {
@@ -105,7 +154,7 @@ export default function Home() {
         setStep("form");
       }
     },
-    [formData]
+    [formData, eventId, eventDetails]
   );
 
   const handleFaceCaptureError = useCallback((message: string) => {
@@ -139,6 +188,17 @@ export default function Home() {
         ? 1
         : 2;
 
+  if (eventError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-950 via-purple-950/30 to-gray-950 flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="backdrop-blur-xl bg-white/[0.03] border border-white/[0.08] rounded-3xl p-6 sm:p-8 shadow-2xl text-center">
+          <h2 className="text-2xl font-bold text-red-400 mb-2">Access Denied</h2>
+          <p className="text-white/60">{eventError}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-purple-950/30 to-gray-950 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Ambient glow effects */}
@@ -156,10 +216,10 @@ export default function Home() {
           />
           <div className="text-left">
             <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-              Vendy Access Portal
+              {eventDetails?.name || "Loading..."}
             </h1>
             <p className="text-white/40 text-xs sm:text-sm mt-1">
-              Your Smart Event Companion
+              {eventDetails?.event_date || "Please wait..."}
             </p>
           </div>
         </div>
@@ -271,5 +331,17 @@ export default function Home() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
+      </div>
+    }>
+      <RegistrationContent />
+    </Suspense>
   );
 }
