@@ -154,9 +154,8 @@ export default function RegistrationForm({ onSubmit }: RegistrationFormProps) {
                     className="mt-0.5 h-5 w-5 rounded border-white/20 bg-white/10 text-purple-500 focus:ring-purple-500/50 cursor-pointer accent-purple-500"
                 />
                 <label htmlFor="consent" className="text-sm text-white/60 leading-snug cursor-pointer">
-                    I consent to the collection and processing of my biometric data
-                    (facial recognition) for event registration and vending machine
-                    access purposes.
+                    I consent to the collection and processing
+                    of my facial data for event registration and vending machine access purposes.
                 </label>
             </div>
             {errors.consent && <p className={errorClasses}>{errors.consent}</p>}

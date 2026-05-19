@@ -329,7 +329,7 @@ function RegistrationContent() {
 
         {/* Footer */}
         <p className="text-center text-white/15 text-xs mt-6">
-          Secured with biometric encryption · Privacy compliant
+          Protected with secure facial authentication
         </p>
       </div>
     </div>
