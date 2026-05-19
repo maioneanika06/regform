@@ -212,7 +212,7 @@ function RegistrationContent() {
         {/* Header */}
         <div className="flex items-center justify-center gap-4 mb-8">
           <img
-            src="/vendy.png"
+            src="VENDY.png"
             alt="Vendy Logo"
             className="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]"
           />
