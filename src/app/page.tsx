@@ -41,7 +41,9 @@ function RegistrationContent() {
         .single();
 
       if (error || !data) {
-        setEventError("Invalid or missing Event ID.");
+        setEventError(`Supabase Error: ${error.message} (Code: ${error.code})`);
+      } else if (!data) {
+        setEventError(`No Data Error: Nahanap yung database, pero walang event na may ID na ${eventId}`);
       } else {
         setEventDetails(data);
       }
@@ -140,7 +142,7 @@ function RegistrationContent() {
         // 4. Generate QR code for the success screen
         setProcessingMessage("Generating your unique QR code...");
         const qrDataUrl = await generateQRCode(newAttendee.id);
-        
+
         // 5. Success!
         setQrCodeDataUrl(qrDataUrl);
         setStep("success");
@@ -209,9 +211,9 @@ function RegistrationContent() {
       <div className="w-full max-w-md relative z-10">
         {/* Header */}
         <div className="flex items-center justify-center gap-4 mb-8">
-          <img 
-            src="/vendy.png" 
-            alt="Vendy Logo" 
+          <img
+            src="/vendy.png"
+            alt="Vendy Logo"
             className="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]"
           />
           <div className="text-left">
