@@ -116,7 +116,7 @@ export default function RegistrationForm({ onSubmit }: RegistrationFormProps) {
                     id="contactNumber"
                     name="contactNumber"
                     type="tel"
-                    placeholder="+63 912 345 6789"
+                    placeholder="+63 9** *** ***"
                     value={form.contactNumber}
                     onChange={handleChange}
                     className={inputClasses}
@@ -135,7 +135,7 @@ export default function RegistrationForm({ onSubmit }: RegistrationFormProps) {
                     id="company"
                     name="company"
                     type="text"
-                    placeholder="Acme Corp"
+                    placeholder="Adamson University"
                     value={form.company}
                     onChange={handleChange}
                     className={inputClasses}
