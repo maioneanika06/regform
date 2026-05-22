@@ -6,12 +6,14 @@ import Image from "next/image";
 interface SuccessPageProps {
     name: string;
     qrCodeDataUrl: string;
+    emailWarning?: string;
     onRegisterAnother: () => void;
 }
 
 export default function SuccessPage({
     name,
     qrCodeDataUrl,
+    emailWarning,
     onRegisterAnother,
 }: SuccessPageProps) {
     return (
@@ -60,9 +62,14 @@ export default function SuccessPage({
             </div>
 
             <p className="text-white/40 text-xs max-w-xs mx-auto">
-                Present this QR code to access the vending machine. A copy has been
-                saved to your registration record.
+                Present this QR code to access the vending machine.
             </p>
+
+            {emailWarning && (
+                <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-left text-sm text-amber-100/80">
+                    {emailWarning}
+                </div>
+            )}
 
             {/* Register another */}
             <button

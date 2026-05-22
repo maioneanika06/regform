@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
+export const runtime = 'nodejs';
+
 export async function POST(request: Request) {
   try {
     const { email, fullName, eventName, eventDate, attendeeId } = await request.json();
@@ -9,6 +11,17 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
+      );
+    }
+
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+      console.error('Email sending error: Gmail environment variables are missing.');
+      return NextResponse.json(
+        {
+          error: 'Email service is not configured.',
+          code: 'EMAIL_CONFIG_MISSING',
+        },
+        { status: 500 }
       );
     }
 
@@ -48,7 +61,10 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Email sending error:', error);
     return NextResponse.json(
-      { error: 'Failed to send email' },
+      {
+        error: 'Failed to send email.',
+        code: 'EMAIL_SEND_FAILED',
+      },
       { status: 500 }
     );
   }

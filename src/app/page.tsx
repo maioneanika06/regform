@@ -31,6 +31,7 @@ function RegistrationContent() {
   const [formData, setFormData] = useState<FormData | null>(null);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [emailWarning, setEmailWarning] = useState<string>("");
   const [processingMessage, setProcessingMessage] = useState<string>("");
 
   useEffect(() => {
@@ -74,6 +75,7 @@ function RegistrationContent() {
 
       setStep("processing");
       setError("");
+      setEmailWarning("");
 
       try {
         const { data: event, error: eventStatusError } = await supabase
@@ -158,7 +160,11 @@ function RegistrationContent() {
         });
 
         if (!emailResponse.ok) {
-          console.warn('Email failed to send, but registration was successful.');
+          const emailResult = await emailResponse.json().catch(() => null);
+          console.warn('Email failed to send, but registration was successful.', emailResult);
+          setEmailWarning(
+            "Registration saved, but the confirmation email could not be sent. Keep this QR code for event access."
+          );
         }
 
         // 4. Generate QR code for the success screen
@@ -194,6 +200,7 @@ function RegistrationContent() {
     setFormData(null);
     setQrCodeDataUrl("");
     setError("");
+    setEmailWarning("");
     setProcessingMessage("");
     setStep("form");
   }, []);
@@ -344,6 +351,7 @@ function RegistrationContent() {
             <SuccessPage
               name={formData.fullName}
               qrCodeDataUrl={qrCodeDataUrl}
+              emailWarning={emailWarning}
               onRegisterAnother={handleRegisterAnother}
             />
           )}
