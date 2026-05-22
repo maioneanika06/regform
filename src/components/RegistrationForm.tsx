@@ -165,7 +165,7 @@ export default function RegistrationForm({ onSubmit }: RegistrationFormProps) {
                 type="submit"
                 className="w-full py-3.5 rounded-lg font-semibold text-white bg-purple-600 hover:bg-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all duration-200 shadow-lg shadow-purple-600/15"
             >
-                Continue to Face Capture →
+                Verify Email to Continue
             </button>
         </form>
     );

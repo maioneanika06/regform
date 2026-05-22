@@ -4,12 +4,13 @@ import React, { useState, useCallback, useEffect, Suspense } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import RegistrationForm, { FormData } from "@/components/RegistrationForm";
+import EmailVerification from "@/components/EmailVerification";
 import FaceCapture from "@/components/FaceCapture";
 import SuccessPage from "@/components/SuccessPage";
 import { supabase } from "@/lib/supabase";
 import { generateQRCode } from "@/lib/qrcode";
 
-type Step = "form" | "face" | "processing" | "success";
+type Step = "form" | "email" | "face" | "processing" | "success";
 type EventDetails = {
   name: string;
   event_date: string;
@@ -33,6 +34,8 @@ function RegistrationContent() {
   const [error, setError] = useState<string>("");
   const [emailWarning, setEmailWarning] = useState<string>("");
   const [processingMessage, setProcessingMessage] = useState<string>("");
+  const [emailChallengeToken, setEmailChallengeToken] = useState<string>("");
+  const [emailVerificationToken, setEmailVerificationToken] = useState<string>("");
 
   useEffect(() => {
     if (!eventId) {
@@ -63,15 +66,50 @@ function RegistrationContent() {
     fetchEvent();
   }, [eventId]);
 
-  const handleFormSubmit = useCallback((data: FormData) => {
+  const requestEmailCode = useCallback(async (data: FormData) => {
+    const response = await fetch("/api/verify-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "request",
+        email: data.email,
+        fullName: data.fullName,
+      }),
+    });
+    const result = await response.json().catch(() => null);
+
+    if (!response.ok || !result?.token) {
+      throw new Error(result?.error || "Could not send the email verification code.");
+    }
+
+    setEmailChallengeToken(result.token);
+  }, []);
+
+  const handleFormSubmit = useCallback(async (data: FormData) => {
     setFormData(data);
     setError("");
-    setStep("face");
-  }, []);
+    setEmailVerificationToken("");
+    setProcessingMessage("Sending email verification code...");
+    setStep("processing");
+
+    try {
+      await requestEmailCode(data);
+      setStep("email");
+    } catch (err) {
+      console.error("Email verification request failed:", err);
+      setError(err instanceof Error ? err.message : "Could not send the email verification code.");
+      setStep("form");
+    }
+  }, [requestEmailCode]);
 
   const handleFaceCapture = useCallback(
     async (descriptor: number[]) => {
       if (!formData || !eventId) return;
+      if (!emailVerificationToken) {
+        setError("Verify your email before face capture.");
+        setStep("form");
+        return;
+      }
 
       setStep("processing");
       setError("");
@@ -86,6 +124,24 @@ function RegistrationContent() {
 
         if (eventStatusError || !event || event.status !== "ACTIVE") {
           setEventError("Registration is closed because this event has ended.");
+          setStep("form");
+          return;
+        }
+
+        setProcessingMessage("Confirming email verification...");
+        const verificationResponse = await fetch("/api/verify-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "validate",
+            email: formData.email,
+            token: emailVerificationToken,
+          }),
+        });
+        const verificationResult = await verificationResponse.json().catch(() => null);
+
+        if (!verificationResponse.ok || !verificationResult?.verified) {
+          setError(verificationResult?.error || "Verify your email before registration.");
           setStep("form");
           return;
         }
@@ -184,7 +240,7 @@ function RegistrationContent() {
         setStep("form");
       }
     },
-    [formData, eventId, eventDetails]
+    [formData, eventId, eventDetails, emailVerificationToken]
   );
 
   const handleFaceCaptureError = useCallback((message: string) => {
@@ -193,7 +249,7 @@ function RegistrationContent() {
   }, []);
 
   const handleCancelFace = useCallback(() => {
-    setStep("form");
+    setStep("email");
   }, []);
 
   const handleRegisterAnother = useCallback(() => {
@@ -202,12 +258,15 @@ function RegistrationContent() {
     setError("");
     setEmailWarning("");
     setProcessingMessage("");
+    setEmailChallengeToken("");
+    setEmailVerificationToken("");
     setStep("form");
   }, []);
 
   // Step indicator
   const steps = [
     { key: "form", label: "Details", icon: "📝" },
+    { key: "email", label: "Email", icon: "@" },
     { key: "face", label: "Face Scan", icon: "📷" },
     { key: "success", label: "Complete", icon: "✅" },
   ];
@@ -215,9 +274,11 @@ function RegistrationContent() {
   const currentStepIndex =
     step === "form"
       ? 0
-      : step === "face" || step === "processing"
+      : step === "email" || step === "processing"
         ? 1
-        : 2;
+        : step === "face"
+          ? 2
+          : 3;
 
   if (eventError) {
     return (
@@ -318,6 +379,20 @@ function RegistrationContent() {
             <div className="animate-fadeIn">
               <RegistrationForm onSubmit={handleFormSubmit} />
             </div>
+          )}
+
+          {/* Step: Email Verification */}
+          {step === "email" && formData && emailChallengeToken && (
+            <EmailVerification
+              email={formData.email}
+              token={emailChallengeToken}
+              onBack={() => setStep("form")}
+              onResend={() => requestEmailCode(formData)}
+              onVerified={(verificationToken) => {
+                setEmailVerificationToken(verificationToken);
+                setStep("face");
+              }}
+            />
           )}
 
           {/* Step: Face Capture */}
