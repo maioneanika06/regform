@@ -10,6 +10,11 @@ import { supabase } from "@/lib/supabase";
 import { generateQRCode } from "@/lib/qrcode";
 
 type Step = "form" | "face" | "processing" | "success";
+type EventDetails = {
+  name: string;
+  event_date: string;
+  status: string;
+};
 
 function sanitize(str: string): string {
   return str.replace(/[<>&"']/g, "").trim();
@@ -19,7 +24,7 @@ function RegistrationContent() {
   const searchParams = useSearchParams();
   const eventId = searchParams.get("eventId");
 
-  const [eventDetails, setEventDetails] = useState<{ name: string; event_date: string } | null>(null);
+  const [eventDetails, setEventDetails] = useState<EventDetails | null>(null);
   const [eventError, setEventError] = useState<string>("");
 
   const [step, setStep] = useState<Step>("form");
@@ -38,7 +43,7 @@ function RegistrationContent() {
     const fetchEvent = async () => {
       const { data, error } = await supabase
         .from("events")
-        .select("name, event_date")
+        .select("name, event_date, status")
         .eq("id", eventId)
         .single();
 
@@ -46,6 +51,9 @@ function RegistrationContent() {
         setEventError(`Supabase Error: ${error.message} (Code: ${error.code})`);
       } else if (!data) {
         setEventError(`No Data Error: Nahanap yung database, pero walang event na may ID na ${eventId}`);
+      } else if (data.status !== "ACTIVE") {
+        setEventDetails(data);
+        setEventError("Registration is closed because this event has ended.");
       } else {
         setEventDetails(data);
       }
@@ -68,6 +76,18 @@ function RegistrationContent() {
       setError("");
 
       try {
+        const { data: event, error: eventStatusError } = await supabase
+          .from("events")
+          .select("status")
+          .eq("id", eventId)
+          .single();
+
+        if (eventStatusError || !event || event.status !== "ACTIVE") {
+          setEventError("Registration is closed because this event has ended.");
+          setStep("form");
+          return;
+        }
+
         // 1. Check duplicate email for THIS event
         setProcessingMessage("Checking email availability...");
         const { data: existing, error: selectError } = await supabase
