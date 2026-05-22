@@ -67,8 +67,8 @@ export default function RegistrationForm({ onSubmit }: RegistrationFormProps) {
     }
 
     const inputClasses =
-        "w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300";
-    const labelClasses = "block text-sm font-medium text-white/70 mb-1.5";
+        "w-full px-4 py-3 rounded-lg bg-white/[0.025] border border-white/[0.08] text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-purple-500/35 focus:ring-1 focus:ring-purple-500/15 transition-all duration-200";
+    const labelClasses = "block text-[11px] font-semibold uppercase tracking-[0.12em] text-white/35 mb-2";
     const errorClasses = "text-red-400 text-xs mt-1";
 
     return (
@@ -144,7 +144,7 @@ export default function RegistrationForm({ onSubmit }: RegistrationFormProps) {
             </div>
 
             {/* Consent */}
-            <div className="flex items-start gap-3 p-4 rounded-xl bg-white/5 border border-white/10">
+            <div className="flex items-start gap-3 p-4 rounded-lg bg-white/[0.02] border border-white/[0.07]">
                 <input
                     id="consent"
                     name="consent"
@@ -163,7 +163,7 @@ export default function RegistrationForm({ onSubmit }: RegistrationFormProps) {
             {/* Submit */}
             <button
                 type="submit"
-                className="w-full py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all duration-300 shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full py-3.5 rounded-lg font-semibold text-white bg-purple-600 hover:bg-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all duration-200 shadow-lg shadow-purple-600/15"
             >
                 Continue to Face Capture →
             </button>

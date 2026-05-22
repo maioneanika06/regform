@@ -18,9 +18,9 @@ export default function SuccessPage({
         <div className="text-center space-y-6 animate-fadeIn">
             {/* Success icon */}
             <div className="flex justify-center">
-                <div className="w-20 h-20 rounded-full bg-green-500/10 border-2 border-green-500/30 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-xl bg-green-500/10 border border-green-500/25 flex items-center justify-center">
                     <svg
-                        className="w-10 h-10 text-green-400"
+                        className="w-8 h-8 text-green-400"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -48,7 +48,7 @@ export default function SuccessPage({
 
             {/* QR Code */}
             <div className="flex justify-center">
-                <div className="p-4 bg-white rounded-2xl shadow-2xl shadow-purple-500/20">
+                <div className="p-4 bg-white rounded-xl shadow-2xl shadow-black/20">
                     <Image
                         src={qrCodeDataUrl}
                         alt="Your unique QR code"
@@ -68,7 +68,7 @@ export default function SuccessPage({
             <button
                 type="button"
                 onClick={onRegisterAnother}
-                className="w-full py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 transition-all duration-300 shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full py-3.5 rounded-lg font-semibold text-white bg-purple-600 hover:bg-purple-500 transition-all duration-200 shadow-lg shadow-purple-600/15"
             >
                 Register Another Attendee
             </button>

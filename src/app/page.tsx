@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useCallback, useEffect, Suspense } from "react";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import RegistrationForm, { FormData } from "@/components/RegistrationForm";
 import FaceCapture from "@/components/FaceCapture";
@@ -29,6 +30,7 @@ function RegistrationContent() {
 
   useEffect(() => {
     if (!eventId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEventError("No event ID provided in the URL.");
       return;
     }
@@ -102,7 +104,7 @@ function RegistrationContent() {
             email: sanitize(formData.email).toLowerCase(),
             contact_number: sanitize(formData.contactNumber),
             company: sanitize(formData.company),
-            role: 'Attendee',
+            role: 'attendee',
             face_encoding: descriptor,
           })
           .select("id")
@@ -192,8 +194,8 @@ function RegistrationContent() {
 
   if (eventError) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-950 via-purple-950/30 to-gray-950 flex items-center justify-center p-4 relative overflow-hidden">
-        <div className="backdrop-blur-xl bg-white/[0.03] border border-white/[0.08] rounded-3xl p-6 sm:p-8 shadow-2xl text-center">
+      <div className="min-h-screen bg-[#09090b] flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-white/[0.02] border border-white/[0.07] rounded-2xl p-6 sm:p-8 shadow-2xl shadow-black/20 text-center">
           <h2 className="text-2xl font-bold text-red-400 mb-2">Access Denied</h2>
           <p className="text-white/60">{eventError}</p>
         </div>
@@ -202,32 +204,32 @@ function RegistrationContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-purple-950/30 to-gray-950 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Ambient glow effects */}
-      <div className="absolute top-[-20%] left-[-10%] w-[40%] h-[40%] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[40%] bg-pink-600/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30%] h-[30%] bg-purple-500/5 rounded-full blur-[100px] pointer-events-none" />
-
-      <div className="w-full max-w-md relative z-10">
+    <div className="min-h-screen bg-[#09090b] flex items-center justify-center p-4 sm:p-6">
+      <div className="w-full max-w-[560px]">
         {/* Header */}
-        <div className="flex items-center justify-center gap-4 mb-8">
-          <img
-            src="VENDY.png"
+        <div className="flex items-center gap-4 mb-6 rounded-2xl border border-white/[0.06] bg-white/[0.015] px-5 py-4">
+          <Image
+            src="/VENDY.png"
             alt="Vendy Logo"
-            className="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]"
+            width={64}
+            height={64}
+            className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-xl ring-1 ring-purple-500/10"
           />
-          <div className="text-left">
-            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+          <div className="min-w-0 text-left">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-purple-300/50">
+              Event Registration
+            </p>
+            <h1 className="text-xl sm:text-2xl font-semibold text-white tracking-tight truncate">
               {eventDetails?.name || "Loading..."}
             </h1>
-            <p className="text-white/40 text-xs sm:text-sm mt-1">
+            <p className="text-white/35 text-xs sm:text-sm mt-1">
               {eventDetails?.event_date || "Please wait..."}
             </p>
           </div>
         </div>
 
         {/* Step progress */}
-        <div className="flex items-center justify-center gap-2 mb-6">
+        <div className="flex items-center justify-center gap-2 mb-4 rounded-2xl border border-white/[0.05] bg-white/[0.015] px-3 py-3">
           {steps.map((s, i) => (
             <React.Fragment key={s.key}>
               <div className="flex items-center gap-1.5">
@@ -235,8 +237,8 @@ function RegistrationContent() {
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500 ${i < currentStepIndex
                     ? "bg-green-500/20 text-green-400 border border-green-500/30"
                     : i === currentStepIndex
-                      ? "bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-lg shadow-purple-500/20"
-                      : "bg-white/5 text-white/30 border border-white/10"
+                      ? "bg-purple-500/15 text-purple-300 border border-purple-500/35"
+                      : "bg-white/[0.03] text-white/30 border border-white/[0.08]"
                     }`}
                 >
                   {i < currentStepIndex ? "✓" : s.icon}
@@ -263,7 +265,7 @@ function RegistrationContent() {
         </div>
 
         {/* Main card */}
-        <div className="backdrop-blur-xl bg-white/[0.03] border border-white/[0.08] rounded-3xl p-6 sm:p-8 shadow-2xl shadow-black/20">
+        <div className="bg-white/[0.02] border border-white/[0.07] rounded-2xl p-5 sm:p-7 shadow-2xl shadow-black/20">
           {/* Error banner */}
           {error && step === "form" && (
             <div className="mb-5 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-sm flex items-start gap-3 animate-fadeIn">
@@ -306,7 +308,7 @@ function RegistrationContent() {
           {step === "processing" && (
             <div className="py-12 text-center space-y-6 animate-fadeIn">
               <div className="flex justify-center">
-                <div className="w-16 h-16 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
+                <div className="w-14 h-14 border-4 border-purple-500/15 border-t-purple-400 rounded-full animate-spin" />
               </div>
               <div>
                 <p className="text-white font-medium">{processingMessage}</p>
@@ -328,7 +330,7 @@ function RegistrationContent() {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-white/15 text-xs mt-6">
+        <p className="text-center text-white/15 text-xs mt-5">
           Protected with secure facial authentication
         </p>
       </div>
@@ -340,7 +342,7 @@ export default function Home() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
+        <div className="w-16 h-16 border-4 border-purple-500/15 border-t-purple-400 rounded-full animate-spin" />
       </div>
     }>
       <RegistrationContent />
