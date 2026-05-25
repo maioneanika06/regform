@@ -85,14 +85,43 @@ function RegistrationContent() {
     setEmailChallengeToken(result.token);
   }, []);
 
+  const assertEmailAvailable = useCallback(async (email: string) => {
+    if (!eventId) {
+      throw new Error("No event ID provided in the URL.");
+    }
+
+    const { data: existing, error: selectError } = await supabase
+      .from("attendees")
+      .select("id")
+      .eq("email", email.toLowerCase().trim())
+      .eq("event_id", eventId)
+      .maybeSingle();
+
+    if (selectError) {
+      console.error("Supabase select error:", selectError);
+      throw new Error(
+        `Database error: ${selectError.message}. Make sure the 'attendees' table exists in Supabase (run schema.sql).`
+      );
+    }
+
+    if (existing) {
+      throw new Error(
+        "This email is already registered for this event. Please use a different email address."
+      );
+    }
+  }, [eventId]);
+
   const handleFormSubmit = useCallback(async (data: FormData) => {
     setFormData(data);
     setError("");
+    setEmailChallengeToken("");
     setEmailVerificationToken("");
-    setProcessingMessage("Sending email verification code...");
+    setProcessingMessage("Checking email availability...");
     setStep("processing");
 
     try {
+      await assertEmailAvailable(data.email);
+      setProcessingMessage("Sending email verification code...");
       await requestEmailCode(data);
       setStep("email");
     } catch (err) {
@@ -100,7 +129,7 @@ function RegistrationContent() {
       setError(err instanceof Error ? err.message : "Could not send the email verification code.");
       setStep("form");
     }
-  }, [requestEmailCode]);
+  }, [assertEmailAvailable, requestEmailCode]);
 
   const handleFaceCapture = useCallback(
     async (descriptor: number[]) => {
@@ -148,26 +177,10 @@ function RegistrationContent() {
 
         // 1. Check duplicate email for THIS event
         setProcessingMessage("Checking email availability...");
-        const { data: existing, error: selectError } = await supabase
-          .from("attendees")
-          .select("id")
-          .eq("email", formData.email.toLowerCase().trim())
-          .eq("event_id", eventId)
-          .maybeSingle();
-
-        if (selectError) {
-          console.error("Supabase select error:", selectError);
-          setError(
-            `Database error: ${selectError.message}. Make sure the 'attendees' table exists in Supabase (run schema.sql).`
-          );
-          setStep("form");
-          return;
-        }
-
-        if (existing) {
-          setError(
-            "This email is already registered for this event. Please use a different email address."
-          );
+        try {
+          await assertEmailAvailable(formData.email);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "This email is already registered for this event.");
           setStep("form");
           return;
         }
@@ -240,7 +253,7 @@ function RegistrationContent() {
         setStep("form");
       }
     },
-    [formData, eventId, eventDetails, emailVerificationToken]
+    [formData, eventId, eventDetails, emailVerificationToken, assertEmailAvailable]
   );
 
   const handleFaceCaptureError = useCallback((message: string) => {
