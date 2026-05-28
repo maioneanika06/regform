@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { logLatency } from "@/lib/latency";
 
 interface EmailVerificationProps {
     email: string;
@@ -24,6 +25,7 @@ export default function EmailVerification({
 
     async function handleSubmit(event: React.FormEvent) {
         event.preventDefault();
+        const verificationStart = performance.now();
         setError("");
         setSubmitting(true);
 
@@ -40,13 +42,20 @@ export default function EmailVerification({
             const result = await response.json().catch(() => null);
 
             if (!response.ok || !result?.verificationToken) {
+                logLatency("OTP Verification", verificationStart, "failed", {
+                    reason: result?.error || "Email verification failed.",
+                });
                 setError(result?.error || "Email verification failed.");
                 return;
             }
 
+            logLatency("OTP Verification", verificationStart);
             onVerified(result.verificationToken);
         } catch (err) {
             console.error("Email code verification failed:", err);
+            logLatency("OTP Verification", verificationStart, "failed", {
+                reason: err instanceof Error ? err.message : String(err),
+            });
             setError("Email verification failed. Please try again.");
         } finally {
             setSubmitting(false);

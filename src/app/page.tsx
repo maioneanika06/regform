@@ -9,6 +9,7 @@ import FaceCapture from "@/components/FaceCapture";
 import SuccessPage from "@/components/SuccessPage";
 import { supabase } from "@/lib/supabase";
 import { generateQRCode } from "@/lib/qrcode";
+import { logLatency } from "@/lib/latency";
 
 type Step = "form" | "email" | "face" | "processing" | "success";
 type EventDetails = {
@@ -112,6 +113,7 @@ function RegistrationContent() {
   }, [eventId]);
 
   const handleFormSubmit = useCallback(async (data: FormData) => {
+    const submitStart = performance.now();
     setFormData(data);
     setError("");
     setEmailChallengeToken("");
@@ -123,9 +125,13 @@ function RegistrationContent() {
       await assertEmailAvailable(data.email);
       setProcessingMessage("Sending email verification code...");
       await requestEmailCode(data);
+      logLatency("Registration Form Submission", submitStart);
       setStep("email");
     } catch (err) {
       console.error("Email verification request failed:", err);
+      logLatency("Registration Form Submission", submitStart, "failed", {
+        reason: err instanceof Error ? err.message : String(err),
+      });
       setError(err instanceof Error ? err.message : "Could not send the email verification code.");
       setStep("form");
     }
@@ -187,6 +193,7 @@ function RegistrationContent() {
 
         // 2. Insert into Supabase
         setProcessingMessage("Saving registration data...");
+        const faceDataSavingStart = performance.now();
         const { data: newAttendee, error: insertError } = await supabase
           .from("attendees")
           .insert({
@@ -202,6 +209,9 @@ function RegistrationContent() {
           .single();
 
         if (insertError || !newAttendee) {
+          logLatency("Face Data Saving", faceDataSavingStart, "failed", {
+            reason: insertError?.message || "Unknown insert error",
+          });
           console.error("Supabase insert error:", insertError);
           if (insertError?.code === "23505") {
             setError(
@@ -213,6 +223,7 @@ function RegistrationContent() {
           setStep("form");
           return;
         }
+        logLatency("Face Data Saving", faceDataSavingStart);
 
         // 3. Send Email
         setProcessingMessage("Sending confirmation email...");
@@ -238,7 +249,9 @@ function RegistrationContent() {
 
         // 4. Generate QR code for the success screen
         setProcessingMessage("Generating your unique QR code...");
+        const qrGenerationStart = performance.now();
         const qrDataUrl = await generateQRCode(newAttendee.id);
+        logLatency("QR Code Generation", qrGenerationStart);
 
         // 5. Success!
         setQrCodeDataUrl(qrDataUrl);
