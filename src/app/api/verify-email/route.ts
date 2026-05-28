@@ -7,6 +7,7 @@ import {
     isEmailFormatValid,
     normalizeEmail,
 } from "@/lib/email-verification";
+import { measureLatency, writeLatencyLog } from "@/lib/server-latency";
 
 export const runtime = "nodejs";
 
@@ -51,25 +52,28 @@ async function requestCode(body: VerifyEmailBody) {
     }
 
     const challenge = createEmailChallenge(email);
-    await transporter.sendMail({
-        from: `"Vendy Access Portal" <${process.env.GMAIL_USER}>`,
-        to: email,
-        subject: "Verify your Vendy registration email",
-        html: `
-            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-                <h2 style="color: #6b21a8;">Verify your email</h2>
-                <p>Hi ${body.fullName || "Attendee"},</p>
-                <p>Enter this code to continue your Vendy registration:</p>
-                <p style="font-size: 32px; font-weight: bold; letter-spacing: 6px;">${challenge.code}</p>
-                <p>This code expires in 10 minutes. The QR code and face registration are created only after this step.</p>
-            </div>
-        `,
-    });
+    await measureLatency("Send Email Verification OTP", async () => {
+        await transporter.sendMail({
+            from: `"Vendy Access Portal" <${process.env.GMAIL_USER}>`,
+            to: email,
+            subject: "Verify your Vendy registration email",
+            html: `
+                <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+                    <h2 style="color: #6b21a8;">Verify your email</h2>
+                    <p>Hi ${body.fullName || "Attendee"},</p>
+                    <p>Enter this code to continue your Vendy registration:</p>
+                    <p style="font-size: 32px; font-weight: bold; letter-spacing: 6px;">${challenge.code}</p>
+                    <p>This code expires in 10 minutes. The QR code and face registration are created only after this step.</p>
+                </div>
+            `,
+        });
+    }, { email });
 
     return NextResponse.json({ token: challenge.token });
 }
 
-function confirmCode(body: VerifyEmailBody) {
+async function confirmCode(body: VerifyEmailBody) {
+    const startedAt = performance.now();
     if (!body.token || !body.code) {
         return NextResponse.json(
             { error: "Verification token and code are required." },
@@ -83,12 +87,23 @@ function confirmCode(body: VerifyEmailBody) {
     );
 
     if (!verificationToken) {
+        await writeLatencyLog({
+            process: "Accept Email Verification OTP",
+            latencySec: (performance.now() - startedAt) / 1000,
+            status: "failed",
+            metadata: { result: "invalid_or_expired" },
+        });
         return NextResponse.json(
             { error: "The verification code is invalid or expired." },
             { status: 400 }
         );
     }
 
+    await writeLatencyLog({
+        process: "Accept Email Verification OTP",
+        latencySec: (performance.now() - startedAt) / 1000,
+        status: "success",
+    });
     return NextResponse.json({ verificationToken });
 }
 
@@ -115,7 +130,7 @@ export async function POST(request: Request) {
         }
 
         if (body.action === "confirm") {
-            return confirmCode(body);
+            return await confirmCode(body);
         }
 
         if (body.action === "validate") {

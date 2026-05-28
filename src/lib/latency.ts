@@ -48,6 +48,11 @@ export function logLatency(
     };
     const entries = [...readEntries(), entry];
     writeEntries(entries);
+    void fetch("/api/latency-log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(entry),
+    }).catch(() => undefined);
     console.info(`[LATENCY] ${process}: ${entry.latencySec}s (${status})`, metadata || "");
 }
 

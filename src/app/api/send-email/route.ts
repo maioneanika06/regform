@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import { measureLatency } from '@/lib/server-latency';
 
 export const runtime = 'nodejs';
 
@@ -55,7 +56,9 @@ export async function POST(request: Request) {
       `,
     };
 
-    await transporter.sendMail(mailOptions);
+    await measureLatency("Send Confirmation Email", async () => {
+      await transporter.sendMail(mailOptions);
+    }, { email, attendeeId });
 
     return NextResponse.json({ success: true, message: 'Email sent successfully' });
   } catch (error) {

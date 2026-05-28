@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import { loadModels, detectFace, faceapi } from "@/lib/faceapi";
+import { logLatency } from "@/lib/latency";
 
 interface FaceCaptureProps {
     onCapture: (descriptor: number[]) => void;
@@ -175,16 +176,21 @@ export default function FaceCapture({
         setStatus("detecting");
         setMessage("Extracting facial features...");
 
+        const captureStart = performance.now();
         try {
             const descriptor = await detectFace(videoRef.current);
 
             if (!descriptor) {
+                logLatency("Capture Face Descriptor", captureStart, "failed", {
+                    reason: "no_face_detected",
+                });
                 setStatus("ready");
                 setMessage(
                     "No face detected. Please position your face clearly in the frame and try again."
                 );
                 return;
             }
+            logLatency("Capture Face Descriptor", captureStart);
 
             setStatus("captured");
             setMessage("Face captured successfully!");
@@ -201,7 +207,10 @@ export default function FaceCapture({
             setTimeout(() => {
                 onCapture(descriptor);
             }, 800);
-        } catch {
+        } catch (error) {
+            logLatency("Capture Face Descriptor", captureStart, "failed", {
+                reason: error instanceof Error ? error.message : String(error),
+            });
             setStatus("ready");
             setMessage("Face detection failed. Please try again.");
         }
