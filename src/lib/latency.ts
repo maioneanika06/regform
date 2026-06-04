@@ -48,11 +48,18 @@ export function logLatency(
     };
     const entries = [...readEntries(), entry];
     writeEntries(entries);
-    void fetch("/api/latency-log", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(entry),
-    }).catch(() => undefined);
+    if (navigator.sendBeacon) {
+        navigator.sendBeacon(
+            "/api/latency-log",
+            new Blob([JSON.stringify(entry)], { type: "application/json" })
+        );
+    } else {
+        void fetch("/api/latency-log", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(entry),
+        }).catch(() => undefined);
+    }
     console.info(`[LATENCY] ${process}: ${entry.latencySec}s (${status})`, metadata || "");
 }
 
