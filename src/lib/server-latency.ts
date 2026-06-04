@@ -1,6 +1,7 @@
 import { appendFile, mkdir } from "fs/promises";
 import os from "os";
 import path from "path";
+import { supabase, supabaseAdmin } from "@/lib/supabase";
 
 type LatencyStatus = "success" | "failed";
 
@@ -16,15 +17,33 @@ const LOG_DIR = process.env.VENDY_LATENCY_LOG_DIR || path.join(process.cwd(), "l
 const FALLBACK_LOG_DIR = path.join(os.tmpdir(), "vendy_latency_logs");
 const LOG_FILE = path.join(LOG_DIR, "regform_latency.jsonl");
 const FALLBACK_LOG_FILE = path.join(FALLBACK_LOG_DIR, "regform_latency.jsonl");
+const APP_NAME = "regform";
 
 export async function writeLatencyLog(entry: LatencyEntry) {
-    const line = `${JSON.stringify({
+    const normalizedEntry = {
             timestamp: entry.timestamp || new Date().toISOString(),
             process: entry.process,
             latencySec: Number(entry.latencySec.toFixed(3)),
             status: entry.status || "success",
             metadata: entry.metadata || {},
-        })}\n`;
+        };
+    const line = `${JSON.stringify(normalizedEntry)}\n`;
+
+    try {
+        const client = supabaseAdmin || supabase;
+        const { error } = await client.from("latency_logs").insert({
+            app_name: APP_NAME,
+            process: normalizedEntry.process,
+            latency_sec: normalizedEntry.latencySec,
+            status: normalizedEntry.status,
+            metadata: normalizedEntry.metadata,
+        });
+        if (error) {
+            console.warn("Supabase latency log insert failed:", error.message);
+        }
+    } catch (error) {
+        console.warn("Supabase latency log insert failed:", error);
+    }
 
     try {
         await mkdir(LOG_DIR, { recursive: true });
