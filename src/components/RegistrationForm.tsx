@@ -67,9 +67,9 @@ export default function RegistrationForm({ onSubmit }: RegistrationFormProps) {
     }
 
     const inputClasses =
-        "w-full px-4 py-3 rounded-lg bg-white/[0.025] border border-white/[0.08] text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-purple-500/35 focus:ring-1 focus:ring-purple-500/15 transition-all duration-200";
-    const labelClasses = "block text-[11px] font-semibold uppercase tracking-[0.12em] text-white/35 mb-2";
-    const errorClasses = "text-red-400 text-xs mt-1";
+        "w-full px-4 py-3 rounded-lg bg-white border border-purple-800/35 text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:border-purple-800/60 focus:ring-1 focus:ring-purple-800/20 transition-all duration-200";
+    const labelClasses = "block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600 mb-2";
+    const errorClasses = "text-red-700 text-xs mt-1";
 
     return (
         <form onSubmit={handleSubmit} className="space-y-5" noValidate>
@@ -144,16 +144,16 @@ export default function RegistrationForm({ onSubmit }: RegistrationFormProps) {
             </div>
 
             {/* Consent */}
-            <div className="flex items-start gap-3 p-4 rounded-lg bg-white/[0.02] border border-white/[0.07]">
+            <div className="flex items-start gap-3 p-4 rounded-lg bg-[#faf8fd] border border-purple-800/25">
                 <input
                     id="consent"
                     name="consent"
                     type="checkbox"
                     checked={form.consent}
                     onChange={handleChange}
-                    className="mt-0.5 h-5 w-5 rounded border-white/20 bg-white/10 text-purple-500 focus:ring-purple-500/50 cursor-pointer accent-purple-500"
+                    className="mt-0.5 h-5 w-5 rounded border-purple-800/35 bg-white text-purple-700 focus:ring-purple-800/30 cursor-pointer accent-purple-700"
                 />
-                <label htmlFor="consent" className="text-sm text-white/60 leading-snug cursor-pointer">
+                <label htmlFor="consent" className="text-sm text-slate-600 leading-snug cursor-pointer">
                     I consent to the collection and processing
                     of my facial data for event registration and vending machine access purposes.
                 </label>
@@ -163,7 +163,7 @@ export default function RegistrationForm({ onSubmit }: RegistrationFormProps) {
             {/* Submit */}
             <button
                 type="submit"
-                className="w-full py-3.5 rounded-lg font-semibold text-white bg-purple-600 hover:bg-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all duration-200 shadow-lg shadow-purple-600/15"
+                className="w-full py-3.5 rounded-lg font-semibold text-white bg-purple-700 hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-800/30 transition-all duration-200"
             >
                 Verify Email to Continue
             </button>

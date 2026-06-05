@@ -79,8 +79,8 @@ export default function EmailVerification({
     return (
         <form onSubmit={handleSubmit} className="space-y-5 animate-fadeIn">
             <div>
-                <h2 className="text-xl font-semibold text-white">Verify Email</h2>
-                <p className="text-sm text-white/45 mt-2 break-words">
+                <h2 className="text-xl font-semibold text-slate-950">Verify Email</h2>
+                <p className="text-sm text-slate-600 mt-2 break-words">
                     Enter the 6-digit code sent to {email}.
                 </p>
             </div>
@@ -88,7 +88,7 @@ export default function EmailVerification({
             <div>
                 <label
                     htmlFor="emailCode"
-                    className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-white/35 mb-2"
+                    className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600 mb-2"
                 >
                     Verification Code
                 </label>
@@ -102,16 +102,16 @@ export default function EmailVerification({
                     onChange={(event) =>
                         setCode(event.target.value.replace(/\D/g, "").slice(0, 6))
                     }
-                    className="w-full px-4 py-3 rounded-lg bg-white/[0.025] border border-white/[0.08] text-white text-lg placeholder:text-white/20 focus:outline-none focus:border-purple-500/35 focus:ring-1 focus:ring-purple-500/15"
+                    className="w-full px-4 py-3 rounded-lg bg-white border border-purple-800/35 text-slate-950 text-lg placeholder:text-slate-400 focus:outline-none focus:border-purple-800/60 focus:ring-1 focus:ring-purple-800/20"
                     placeholder="000000"
                 />
-                {error && <p className="text-red-400 text-xs mt-2">{error}</p>}
+                {error && <p className="text-red-700 text-xs mt-2">{error}</p>}
             </div>
 
             <button
                 type="submit"
                 disabled={submitting || code.length !== 6}
-                className="w-full py-3.5 rounded-lg font-semibold text-white bg-purple-600 hover:bg-purple-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 shadow-lg shadow-purple-600/15"
+                className="w-full py-3.5 rounded-lg font-semibold text-white bg-purple-700 hover:bg-purple-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
             >
                 {submitting ? "Checking Code..." : "Continue to Face Capture"}
             </button>
@@ -120,7 +120,7 @@ export default function EmailVerification({
                 <button
                     type="button"
                     onClick={onBack}
-                    className="py-3 rounded-lg border border-white/[0.08] text-sm font-medium text-white/65 hover:bg-white/[0.04] transition-colors"
+                    className="py-3 rounded-lg border border-purple-800/35 text-sm font-medium text-slate-700 hover:bg-[#f4ecfb] transition-colors"
                 >
                     Edit Details
                 </button>
@@ -128,7 +128,7 @@ export default function EmailVerification({
                     type="button"
                     onClick={handleResend}
                     disabled={resending}
-                    className="py-3 rounded-lg border border-white/[0.08] text-sm font-medium text-white/65 hover:bg-white/[0.04] disabled:opacity-40 transition-colors"
+                    className="py-3 rounded-lg border border-purple-800/35 text-sm font-medium text-slate-700 hover:bg-[#f4ecfb] disabled:opacity-40 transition-colors"
                 >
                     {resending ? "Sending..." : "Resend Code"}
                 </button>

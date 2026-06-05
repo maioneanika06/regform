@@ -20,9 +20,9 @@ export default function SuccessPage({
         <div className="text-center space-y-6 animate-fadeIn">
             {/* Success icon */}
             <div className="flex justify-center">
-                <div className="w-16 h-16 rounded-xl bg-green-500/10 border border-green-500/25 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-xl bg-emerald-50 border border-purple-800/25 flex items-center justify-center">
                     <svg
-                        className="w-8 h-8 text-green-400"
+                        className="w-8 h-8 text-emerald-600"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -39,18 +39,18 @@ export default function SuccessPage({
 
             {/* Heading */}
             <div>
-                <h2 className="text-2xl font-bold text-white mb-1">
+                <h2 className="text-2xl font-bold text-slate-950 mb-1">
                     Registration Successful!
                 </h2>
-                <p className="text-white/50 text-sm">
+                <p className="text-slate-600 text-sm">
                     Welcome,{" "}
-                    <span className="text-purple-300 font-medium">{name}</span>
+                    <span className="text-purple-900 font-medium">{name}</span>
                 </p>
             </div>
 
             {/* QR Code */}
             <div className="flex justify-center">
-                <div className="p-4 bg-white rounded-xl shadow-2xl shadow-black/20">
+                <div className="p-4 bg-white rounded-xl border border-purple-800/25">
                     <Image
                         src={qrCodeDataUrl}
                         alt="Your unique QR code"
@@ -61,12 +61,12 @@ export default function SuccessPage({
                 </div>
             </div>
 
-            <p className="text-white/40 text-xs max-w-xs mx-auto">
+            <p className="text-slate-500 text-xs max-w-xs mx-auto">
                 Present this QR code to access the vending machine.
             </p>
 
             {emailWarning && (
-                <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-left text-sm text-amber-100/80">
+                <div className="rounded-lg border border-purple-800/25 bg-amber-50 px-4 py-3 text-left text-sm text-amber-800">
                     {emailWarning}
                 </div>
             )}
@@ -75,7 +75,7 @@ export default function SuccessPage({
             <button
                 type="button"
                 onClick={onRegisterAnother}
-                className="w-full py-3.5 rounded-lg font-semibold text-white bg-purple-600 hover:bg-purple-500 transition-all duration-200 shadow-lg shadow-purple-600/15"
+                className="w-full py-3.5 rounded-lg font-semibold text-white bg-purple-700 hover:bg-purple-800 transition-all duration-200"
             >
                 Register Another Attendee
             </button>

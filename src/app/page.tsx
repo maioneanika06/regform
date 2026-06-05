@@ -308,61 +308,61 @@ function RegistrationContent() {
 
   if (eventError) {
     return (
-      <div className="min-h-screen bg-[#09090b] flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-white/[0.02] border border-white/[0.07] rounded-2xl p-6 sm:p-8 shadow-2xl shadow-black/20 text-center">
-          <h2 className="text-2xl font-bold text-red-400 mb-2">Access Denied</h2>
-          <p className="text-white/60">{eventError}</p>
+      <div className="min-h-screen bg-[#f6f3fa] flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-white border border-purple-800/25 rounded-2xl p-6 sm:p-8 text-center">
+          <h2 className="text-2xl font-bold text-red-700 mb-2">Access Denied</h2>
+          <p className="text-slate-600">{eventError}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#09090b] flex items-center justify-center p-4 sm:p-6">
+    <div className="min-h-screen bg-[#f6f3fa] flex items-center justify-center p-4 sm:p-6">
       <div className="w-full max-w-[560px]">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-6 rounded-2xl border border-white/[0.06] bg-white/[0.015] px-5 py-4">
+        <div className="flex items-center gap-4 mb-6 rounded-2xl border border-purple-800/25 bg-white px-5 py-4">
           <Image
             src="/VENDY.png"
             alt="Vendy Logo"
             width={64}
             height={64}
-            className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-xl ring-1 ring-purple-500/10"
+            className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-xl ring-1 ring-purple-800/35"
           />
           <div className="min-w-0 text-left">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-purple-300/50">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-purple-900/70">
               Event Registration
             </p>
-            <h1 className="text-xl sm:text-2xl font-semibold text-white tracking-tight truncate">
+            <h1 className="text-xl sm:text-2xl font-semibold text-slate-950 tracking-tight truncate">
               {eventDetails?.name || "Loading..."}
             </h1>
-            <p className="text-white/35 text-xs sm:text-sm mt-1">
+            <p className="text-slate-500 text-xs sm:text-sm mt-1">
               {eventDetails?.event_date || "Please wait..."}
             </p>
           </div>
         </div>
 
         {/* Step progress */}
-        <div className="flex items-center justify-center gap-2 mb-4 rounded-2xl border border-white/[0.05] bg-white/[0.015] px-3 py-3">
+        <div className="flex items-center justify-center gap-2 mb-4 rounded-2xl border border-purple-800/25 bg-white px-3 py-3">
           {steps.map((s, i) => (
             <React.Fragment key={s.key}>
               <div className="flex items-center gap-1.5">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500 ${i < currentStepIndex
-                    ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                    ? "bg-emerald-50 text-emerald-700 border border-purple-800/25"
                     : i === currentStepIndex
-                      ? "bg-purple-500/15 text-purple-300 border border-purple-500/35"
-                      : "bg-white/[0.03] text-white/30 border border-white/[0.08]"
+                      ? "bg-[#eee5f7] text-purple-900 border border-purple-800/35"
+                      : "bg-white text-slate-400 border border-purple-800/25"
                     }`}
                 >
                   {i < currentStepIndex ? "✓" : s.icon}
                 </div>
                 <span
                   className={`text-xs font-medium hidden sm:inline transition-colors duration-300 ${i === currentStepIndex
-                    ? "text-purple-300"
+                    ? "text-purple-900"
                     : i < currentStepIndex
-                      ? "text-green-400/60"
-                      : "text-white/20"
+                      ? "text-emerald-700"
+                      : "text-slate-400"
                     }`}
                 >
                   {s.label}
@@ -370,7 +370,7 @@ function RegistrationContent() {
               </div>
               {i < steps.length - 1 && (
                 <div
-                  className={`w-8 h-px transition-colors duration-500 ${i < currentStepIndex ? "bg-green-500/30" : "bg-white/10"
+                  className={`w-8 h-px transition-colors duration-500 ${i < currentStepIndex ? "bg-purple-800/35" : "bg-purple-800/20"
                     }`}
                 />
               )}
@@ -379,12 +379,12 @@ function RegistrationContent() {
         </div>
 
         {/* Main card */}
-        <div className="bg-white/[0.02] border border-white/[0.07] rounded-2xl p-5 sm:p-7 shadow-2xl shadow-black/20">
+        <div className="bg-white border border-purple-800/25 rounded-2xl p-5 sm:p-7">
           {/* Error banner */}
           {error && step === "form" && (
-            <div className="mb-5 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-sm flex items-start gap-3 animate-fadeIn">
+            <div className="mb-5 p-4 rounded-xl bg-red-50 border border-purple-800/25 text-red-700 text-sm flex items-start gap-3 animate-fadeIn">
               <svg
-                className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5"
+                className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -436,11 +436,11 @@ function RegistrationContent() {
           {step === "processing" && (
             <div className="py-12 text-center space-y-6 animate-fadeIn">
               <div className="flex justify-center">
-                <div className="w-14 h-14 border-4 border-purple-500/15 border-t-purple-400 rounded-full animate-spin" />
+                <div className="w-14 h-14 border-4 border-purple-800/35 border-t-purple-700 rounded-full animate-spin" />
               </div>
               <div>
-                <p className="text-white font-medium">{processingMessage}</p>
-                <p className="text-white/30 text-sm mt-1">
+                <p className="text-slate-900 font-medium">{processingMessage}</p>
+                <p className="text-slate-500 text-sm mt-1">
                   Please wait a moment...
                 </p>
               </div>
@@ -459,7 +459,7 @@ function RegistrationContent() {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-white/15 text-xs mt-5">
+        <p className="text-center text-slate-500 text-xs mt-5">
           Protected with secure facial authentication
         </p>
       </div>
@@ -470,8 +470,8 @@ function RegistrationContent() {
 export default function Home() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-purple-500/15 border-t-purple-400 rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#f6f3fa] flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-purple-800/35 border-t-purple-700 rounded-full animate-spin" />
       </div>
     }>
       <RegistrationContent />

@@ -221,10 +221,10 @@ export default function FaceCapture({
             {/* Status message */}
             <div
                 className={`text-center text-sm font-medium px-4 py-3 rounded-xl transition-all duration-300 ${status === "captured"
-                        ? "bg-green-500/10 text-green-400 border border-green-500/20"
+                        ? "bg-emerald-50 text-emerald-700 border border-purple-800/25"
                         : faceDetected
-                            ? "bg-purple-500/[0.08] text-purple-300 border border-purple-500/20"
-                            : "bg-white/[0.02] text-white/60 border border-white/[0.07]"
+                            ? "bg-[#eee5f7] text-purple-900 border border-purple-800/35"
+                            : "bg-white text-slate-600 border border-purple-800/25"
                     }`}
             >
                 {status === "loading" && (
@@ -255,7 +255,7 @@ export default function FaceCapture({
             </div>
 
             {/* Video feed */}
-            <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-black border border-white/[0.08]">
+            <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-black border border-purple-800/35">
                 <video
                     ref={videoRef}
                     className="w-full h-full object-cover mirror"
@@ -272,15 +272,15 @@ export default function FaceCapture({
                 {/* Scanning overlay when loading */}
                 {status === "loading" && (
                     <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
-                        <div className="w-16 h-16 border-4 border-purple-500/20 border-t-purple-400 rounded-full animate-spin" />
+                        <div className="w-16 h-16 border-4 border-purple-200 border-t-purple-700 rounded-full animate-spin" />
                     </div>
                 )}
 
                 {/* Captured flash */}
                 {status === "captured" && (
-                    <div className="absolute inset-0 bg-green-500/10 flex items-center justify-center animate-pulse">
+                    <div className="absolute inset-0 bg-emerald-500/10 flex items-center justify-center">
                         <svg
-                            className="w-20 h-20 text-green-400"
+                            className="w-20 h-20 text-emerald-500"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -302,7 +302,7 @@ export default function FaceCapture({
                     type="button"
                     onClick={onCancel}
                     disabled={status === "detecting" || status === "captured"}
-                    className="flex-1 py-3 rounded-lg font-medium text-white/70 bg-white/[0.025] border border-white/[0.08] hover:bg-white/[0.06] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="flex-1 py-3 rounded-lg font-medium text-slate-700 bg-white border border-purple-800/35 hover:bg-[#f4ecfb] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                     ← Back
                 </button>
@@ -315,7 +315,7 @@ export default function FaceCapture({
                         status === "captured" ||
                         !faceDetected
                     }
-                    className="flex-1 py-3 rounded-lg font-semibold text-white bg-purple-600 hover:bg-purple-500 transition-all duration-200 shadow-lg shadow-purple-600/15 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-purple-600"
+                    className="flex-1 py-3 rounded-lg font-semibold text-white bg-purple-700 hover:bg-purple-800 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-purple-700"
                 >
                     {status === "detecting" ? (
                         <span className="inline-flex items-center gap-2">
